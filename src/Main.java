@@ -24,7 +24,7 @@ public class Main
     public static void main(String[] args) throws Exception
     {
         UIManager.setLookAndFeel(new FlatLightLaf());
-        //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); //If you don't want to use FlatLaf
         UIManager.put("Component.focusWidth", 1);
         UIManager.put( "TextComponent.arc", 10);
         UIManager.put("Component.arc", 10);
@@ -77,7 +77,7 @@ public class Main
         }
 
         mSystemTray = SystemTray.getSystemTray();
-        Image image = Toolkit.getDefaultToolkit().createImage(System.getProperty("user.dir").concat("\\Icons\\chat.png"));
+        Image image = Toolkit.getDefaultToolkit().createImage(System.getProperty("user.dir").concat("\\Icons\\mainIcon.png"));
         mTrayIcon = new TrayIcon(image, "Encrypted Messaging project");
         //Let the system resize the image if needed
         mTrayIcon.setImageAutoSize(true);
