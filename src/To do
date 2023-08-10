@@ -1,0 +1,22 @@
+- Enregistrement + ouverture avec bulles de messages                                                            : OK
+- Sous menu pour l'affichages indépendant des Panels de configuration                                           : OK
+- Ajouter un checkBox dans le menu des vues pour afficher / cacher le bouton d'envoi                            : OK
+- Fichier de configuration pour enregistrer les paramètres de l'utilisateur                                     : OK
+- Mettre un Icon pour chaque sous menu de "Fichier"                                                             : OK
+- Faire fonctionner les sous menus "Importer" et "Exporter" des contacts                                        : OK
+- Rendre "Add contact directement opérationnel sans redémarrage"                                                : OK
+- Remplacer le bouton pour vérifier la connection par un label coloré (vert / rouge)                            : OK
+- Mettre à jour "FileProcessorClass" à la manière de "ConfigFileProcessorClass" (.trim() + serr + !equals())    : OK
+- Créer une zone de notifications                                                                               : OK
+- Système de chiffrage                                                                                          : OK
+- Commenter de manière clair et précise chaque classes
+
+
+
+## Config file by ConfigFileProcessorClass
+[sendMessageButtonVisible]=1
+[contactPanelVisible]=1
+[openContactPanelVisible]=1
+[renameContactPanelVisible]=1
+[addContactPanelVisible]=1
+[checkContactPanelVisible]=1

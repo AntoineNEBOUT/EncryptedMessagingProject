@@ -1,0 +1,12 @@
+<component name="ArtifactManager">
+  <artifact name="EncryptedMessagingProject:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/EncryptedMessagingProject_jar</output-path>
+    <root id="root">
+      <element id="archive" name="EncryptedMessagingProject.jar">
+        <element id="module-output" name="EncryptedMessagingProject" />
+      </element>
+      <element id="library" level="project" name="zip4j-2.11.5" />
+      <element id="library" level="project" name="flatlaf-3.0" />
+    </root>
+  </artifact>
+</component>
