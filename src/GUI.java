@@ -73,9 +73,12 @@ public class GUI
         JMenuItem menuItemQuit = new JMenuItem("Quit");
         JMenuItem menuItemExportContactFile = new JMenuItem("Export contacts");
         JMenuItem menuItemImportContactFile = new JMenuItem("Import contacts");
+        JMenuItem menuItemEditConfigFile = new JMenuItem("Edit config file");
         //menuFile config
         menuFile.add(menuItemImportContactFile);
         menuFile.add(menuItemExportContactFile);
+        menuFile.addSeparator();
+        menuFile.add(menuItemEditConfigFile);
         menuFile.addSeparator();
         menuFile.add(menuItemQuit);
 
@@ -119,6 +122,7 @@ public class GUI
         menuItemLocalIP.setIcon(new ImageIcon(mIconsPath.concat("localIP.png")));
         menuItemPublicIPv4.setIcon(new ImageIcon(mIconsPath.concat("publicIP.png")));
         menuItemPublicIPv6.setIcon(new ImageIcon(mIconsPath.concat("publicIP.png")));
+        menuItemEditConfigFile.setIcon(new ImageIcon(mIconsPath.concat("config.png")));
         stateColorLabel.setIcon(new ImageIcon(mIconsPath.concat("grayState.png")));
 
         messageEditor.setFont(new Font("Segoe UI", Font.PLAIN, 15));
@@ -157,6 +161,9 @@ public class GUI
         isOnlinePanel.setVisible(intToBoolean(Integer.parseInt(config.getValueOf("checkContactPanelVisible"))));
         menuCheckBoxCheckContact.setState(intToBoolean(Integer.parseInt(config.getValueOf("checkContactPanelVisible"))));
 
+        //Initialising port
+        mPort = Integer.parseInt(config.getValueOf("port"));
+
         mCurrentContactName = contactName;
         mCurrentContactIP = contactIP;
 
@@ -187,7 +194,6 @@ public class GUI
                         if(!messageTemp.equals("") && messageTemp != null)
                         {
                             StringTokenizer messagePart = new StringTokenizer(messageTemp, ";");
-                            System.out.println(messageTemp);
                             String tempContactName = messagePart.nextToken();
                             String tempMessageContent = messagePart.nextToken();
 
@@ -282,10 +288,10 @@ public class GUI
             {
                 if((!(addContactNameTextField.getText().equals("")) && !(addContactNameTextField.getText().equals("Contact name"))) && (!(addContactIPTextField.getText().equals("")) && !(addContactIPTextField.getText().equals("Contact IP"))))
                 {
-                    if(!mContactsList.containsKey(addContactNameTextField.getText()) && !mContactsList.containsValue(addContactIPTextField.getText()))
+                    if(!mContactsList.containsKey(addContactNameTextField.getText()) && !mContactsList.containsValue("/".concat(addContactIPTextField.getText())))
                     {
                         FileProcessorClass.writeFile(System.getProperty("user.dir").concat("\\knownUsers.txt"),
-                                addContactIPTextField.getText().concat("=")
+                                "/".concat(addContactIPTextField.getText().concat("="))
                                         .concat(addContactNameTextField.getText()).concat("-"),
                                 "append");
                         FileProcessorClass.createFile(System.getProperty("user.dir").concat("\\Threads\\".concat(addContactIPTextField.getText())
@@ -294,12 +300,13 @@ public class GUI
                         openContactComboBox.addItem(addContactNameTextField.getText());
                         renameContactComboBox.addItem(addContactNameTextField.getText());
 
-                        addContactNameTextField.setText("Contact name");
-                        addContactIPTextField.setText("Contact IP");
-                        addPlaceHolderStyle(addContactNameTextField);
+                                                addPlaceHolderStyle(addContactNameTextField);
                         addPlaceHolderStyle(addContactIPTextField);
 
                         log.writeLog("Contact added : ".concat(addContactNameTextField.getText()).concat(" (").concat(addContactIPTextField.getText()).concat(")"), false);
+
+                        addContactNameTextField.setText("Contact name");
+                        addContactIPTextField.setText("Contact IP");
                     }
                     else
                     {
@@ -482,7 +489,6 @@ public class GUI
             {
                 try 
                 {
-                    JOptionPane.showMessageDialog(null, "Please note that it may change regularly.", "Warning", JOptionPane.WARNING_MESSAGE);
                     URL whatismyip = new URL("http://checkip.amazonaws.com");
                     BufferedReader in = new BufferedReader(new InputStreamReader(
                             whatismyip.openStream()));
@@ -528,6 +534,28 @@ public class GUI
                 catch (URISyntaxException | IOException ex)
                 {
                     throw new RuntimeException(ex);
+                }
+            }
+        });
+
+        menuItemEditConfigFile.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                File configurationFile = new File(System.getProperty("user.dir").concat("\\config.ini"));
+                if(configurationFile.exists())
+                {
+                    try
+                    {
+                        JOptionPane.showMessageDialog(null, "For changes to the configuration file to take effect, the program must be restarted.", "Open configuration file", JOptionPane.WARNING_MESSAGE);
+                        Desktop desktop = Desktop.getDesktop();
+                        desktop.open(configurationFile);
+                    }
+                    catch (IOException ex)
+                    {
+                        throw new RuntimeException(ex);
+                    }
                 }
             }
         });
@@ -731,7 +759,7 @@ public class GUI
         if(!(messageEditor.getText().contains(";")) && !(messageEditor.getText().equals("Enter a message")) && !(messageEditor.getText().equals("")))
         {
             FileProcessorClass.writeFile(System.getProperty("user.dir").concat("\\Threads\\".concat(mCurrentContactIP.replace(":", ".").replace("/", ""))
-                .concat(".txt")), "\nYOU;".concat(messageEditor.getText()), "append");
+                .concat(".txt")), "YOU;".concat(messageEditor.getText()).concat("\n"), "append");
             log.writeLog("New message send to ".concat(mCurrentContactIP), false);
 
             showMessage(0, false, true, messageEditor.getText(), "YOU", Color.GRAY, Color.DARK_GRAY, Color.BLACK, Color.ORANGE);
@@ -751,7 +779,7 @@ public class GUI
         if(!(messageEditor.getText().contains(";")) && !(messageEditor.getText().equals("Enter a message")) && !(messageEditor.getText().equals("")))
         {
             FileProcessorClass.writeFile(System.getProperty("user.dir").concat("\\Threads\\".concat(mCurrentContactIP.replace(":", ".").replace("/", ""))
-                    .concat(".txt")), "\nYOU;".concat(messageEditor.getText()).concat(";LINK"), "append");
+                    .concat(".txt")), "YOU;".concat(messageEditor.getText()).concat(";LINK").concat("\n"), "append");
             log.writeLog("New kyperlink send to ".concat(mCurrentContactIP), false);
 
             showMessage(0, true, true, messageEditor.getText(), "YOU", Color.GRAY, Color.DARK_GRAY, Color.BLUE, Color.ORANGE);
@@ -768,15 +796,13 @@ public class GUI
 
     private void checkConnection()
     {
-        int answerValue = Sender.sendMessage(mCurrentContactIP.replace("/", ""), 8080, "isOnline");
+        int answerValue = Sender.sendMessage(mCurrentContactIP.replace("/", ""), mPort, "isOnline");
         if (answerValue == 1)
         {
-            //JOptionPane.showMessageDialog(null, "Contact \"".concat(mCurrentContactName).concat("\" is online"), "Connection message", JOptionPane.INFORMATION_MESSAGE);
             stateColorLabel.setIcon(new ImageIcon(System.getProperty("user.dir").concat("\\Icons\\greenState.png")));
         }
         else if (answerValue == 2)
         {
-            //JOptionPane.showMessageDialog(null, "Contact \"".concat(mCurrentContactName).concat("\" is offline.\nMessages will not be received."), "Connection message", JOptionPane.WARNING_MESSAGE);
             stateColorLabel.setIcon(new ImageIcon(System.getProperty("user.dir").concat("\\Icons\\redState.png")));
         }
     }
@@ -858,7 +884,7 @@ public class GUI
         {
             if(!isHyperlink)
             {
-                int answerValue = Sender.sendMessage(mCurrentContactIP.replace("/", ""), 8080, "message;".concat(messageEditor.getText()));
+                int answerValue = Sender.sendMessage(mCurrentContactIP.replace("/", ""), mPort, "message;".concat(messageEditor.getText()));
                 if (answerValue == 2)
                 {
                     messageBox.setLayout(new GridLayout(3, 1));
@@ -869,7 +895,7 @@ public class GUI
             }
             else
             {
-                int answerValue = Sender.sendMessage(mCurrentContactIP.replace("/", ""), 8080, "message;".concat(messageEditor.getText()).concat(";LINK"));
+                int answerValue = Sender.sendMessage(mCurrentContactIP.replace("/", ""), mPort, "message;".concat(messageEditor.getText()).concat(";LINK"));
                 if (answerValue == 2)
                 {
                     messageBox.setLayout(new GridLayout(3, 1));
@@ -946,4 +972,5 @@ public class GUI
     private HashMap<String, String> mContactsList;
     private String mIconsPath = System.getProperty("user.dir").concat("\\Icons\\");
     private ConfigFileProcessorClass config;
+    private int mPort;
 }

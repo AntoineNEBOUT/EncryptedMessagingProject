@@ -2,6 +2,7 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.formdev.flatlaf.themes.FlatMacLightLaf;
 import com.formdev.flatlaf.util.Animator;
+import utilPackage.ConfigFileProcessorClass;
 import utilPackage.EncryptionProcessorClass;
 import utilPackage.FileProcessorClass;
 import utilPackage.LogProcessorClass;
@@ -23,8 +24,8 @@ public class Main
 {
     public static void main(String[] args) throws Exception
     {
-        UIManager.setLookAndFeel(new FlatLightLaf());
-        //UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); //If you don't want to use FlatLaf
+        //UIManager.setLookAndFeel(new FlatLightLaf()); //If you want to use FlatLaf
+        UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName()); //If you don't want to use FlatLaf
         UIManager.put("Component.focusWidth", 1);
         UIManager.put( "TextComponent.arc", 10);
         UIManager.put("Component.arc", 10);
@@ -61,15 +62,13 @@ public class Main
             }
             gui.changeContactList(knownUsersList);
         }
+
+        config = new ConfigFileProcessorClass(System.getProperty("user.dir").concat("\\config.ini"));
+        mPort = Integer.parseInt(config.getValueOf("port"));
+
         try
         {
-            if(portString != null && !portString.equals(""))
-            {
-                int port = Integer.parseInt(portString);
-                ss = new ServerSocket(port);
-            }
-            else
-                return;
+            ss = new ServerSocket(mPort);
         }
         catch (IOException e)
         {
@@ -105,7 +104,7 @@ public class Main
     public void run(ServerSocket serversocket)
     {
         System.out.println("====================================\nLocal server is started".concat("\nListen on port ")
-                .concat(portString).concat("\nStorage on ").concat(pathToStorage));
+                .concat(String.valueOf(mPort)).concat("\nStorage on ").concat(pathToStorage));
          System.out.println("Encryption enabled\n====================================");
 
         while(true)
@@ -167,33 +166,32 @@ public class Main
                             {
                                 case "message" ->
                                 {
-                                    writer.println(EncryptionProcessorClass.encrypt("messageReceived;".concat(mOurIpAdress).concat(";").concat(portString), mKey));
+                                    writer.println(EncryptionProcessorClass.encrypt("messageReceived;".concat(mOurIpAdress).concat(";").concat(String.valueOf(mPort)), mKey));
 
                                     String contactNotification = "";
-                                    if (knownUsersList.containsValue(String.valueOf(soc.getInetAddress())))
+                                    if(knownUsersList.containsValue(String.valueOf(soc.getInetAddress())))
                                     {
+                                        JOptionPane.showMessageDialog(null, String.valueOf(soc.getInetAddress()).concat(knownUsersList.values().toString()), "OUI", JOptionPane.INFORMATION_MESSAGE);
                                         contactNotification = contactsName.get(contactsIP.indexOf(String.valueOf(soc.getInetAddress())));
 
-                                        String lineToSave = "";
+                                        String lineToSave = contactsName.get(contactsIP.indexOf(String.valueOf(soc.getInetAddress()))).concat(";").concat(content1).concat("\n");
                                         if(isHyperlink)
-                                            lineToSave = "\n".concat(contactsName.get(contactsIP.indexOf(String.valueOf(soc.getInetAddress())))).concat(";").concat(content1).concat(";LINK");
-                                        else
-                                            lineToSave = "\n".concat(contactsName.get(contactsIP.indexOf(String.valueOf(soc.getInetAddress())))).concat(";").concat(content1);
+                                            lineToSave = contactsName.get(contactsIP.indexOf(String.valueOf(soc.getInetAddress()))).concat(";").concat(content1).concat(";LINK").concat("\n");
 
                                         FileProcessorClass.writeFile(System.getProperty("user.dir").concat("\\Threads\\".concat(String.valueOf(soc.getInetAddress())
-                                        .replace(":", ".").replace("/", ""))
-                                        .concat(".txt")), lineToSave, "append");
-
-                                        if(isHyperlink)
-                                            log.writeLog("New link from ".concat((String.valueOf(soc.getInetAddress()))), false);
-                                        else
-                                            log.writeLog("New message from ".concat((String.valueOf(soc.getInetAddress()))), false);
+                                        .replace(":", ".").replace("/", "")).concat(".txt")), lineToSave, "append");
                                     }
                                     else
                                     {
+                                        JOptionPane.showMessageDialog(null, String.valueOf(soc.getInetAddress()).concat(knownUsersList.values().toString()), "NON", JOptionPane.INFORMATION_MESSAGE);
                                         contactNotification = String.valueOf(soc.getInetAddress());
 
                                         knownUsersList.put(String.valueOf(soc.getInetAddress()), String.valueOf(soc.getInetAddress()));
+                                        contactsName.add(String.valueOf(soc.getInetAddress()));
+                                        contactsIP.add(String.valueOf(soc.getInetAddress()));
+                                        gui.changeContactList(knownUsersList);
+                                        gui.appendElementOpenContactComboBox(String.valueOf(soc.getInetAddress()));
+                                        gui.appendElementOpenContactComboBox(String.valueOf(soc.getInetAddress()));
 
                                         FileProcessorClass.writeFile(System.getProperty("user.dir").concat("\\knownUsers.txt"),
                                                 String.valueOf(soc.getInetAddress()).concat("=")
@@ -203,21 +201,20 @@ public class Main
                                         FileProcessorClass.createFile(System.getProperty("user.dir").concat("\\Threads\\".concat(String.valueOf(soc.getInetAddress())
                                                 .replace(":", ".").replace("/", ""))).concat(".txt"));
 
-                                        String lineToSave = "";
+                                        String lineToSave = String.valueOf(soc.getInetAddress()).concat(";").concat(content1).concat("\n");
+
                                         if(isHyperlink)
-                                            lineToSave = contactsName.get(contactsIP.indexOf(String.valueOf(soc.getInetAddress()))).concat(content1).concat(";LINK");
-                                        else
-                                            lineToSave = contactsName.get(contactsIP.indexOf(String.valueOf(soc.getInetAddress()))).concat(content1);
+                                            lineToSave = String.valueOf(soc.getInetAddress()).concat(";").concat(content1).concat(";LINK").concat("\n");
 
                                         FileProcessorClass.writeFile(System.getProperty("user.dir").concat("\\Threads\\").concat(String.valueOf(soc.getInetAddress())
                                                         .replace(":", ".").replace("/", "")).concat(".txt"),
-                                                lineToSave, "write");
+                                                lineToSave, "append");
 
-                                        if(isHyperlink)
-                                            log.writeLog("New link from ".concat((String.valueOf(soc.getInetAddress()))), false);
-                                        else
-                                            log.writeLog("New message from ".concat((String.valueOf(soc.getInetAddress()))), false);
                                     }
+                                    if(isHyperlink)
+                                        log.writeLog("New link from ".concat((String.valueOf(soc.getInetAddress()))), false);
+                                    else
+                                        log.writeLog("New message from ".concat((String.valueOf(soc.getInetAddress()))), false);
 
                                     //Notification
                                     //From StackOverflow : https://stackoverflow.com/questions/34490218/how-to-make-a-windows-notification-in-java
@@ -232,7 +229,7 @@ public class Main
                                 case "isOnline" ->
                                 {
                                     System.out.println(mOurIpAdress);
-                                    writer.println(EncryptionProcessorClass.encrypt("serverIsOnline;".concat(mOurIpAdress).concat(";").concat(portString), mKey));
+                                    writer.println(EncryptionProcessorClass.encrypt("serverIsOnline;".concat(mOurIpAdress).concat(";").concat(String.valueOf(mPort)), mKey));
                                     soc.close();
                                 }
                                 case "stop" ->
@@ -284,7 +281,7 @@ public class Main
     static boolean socketCanBeRunning = true;
     static int index = 0;
     static HashMap<String, String> knownUsersList = new HashMap<String, String>();
-    static String portString = "8080";
+    static int mPort;
     static String pathToStorage = System.getProperty("user.dir");
     static InetAddress address;
     static
@@ -304,4 +301,5 @@ public class Main
     static SystemTray mSystemTray;
     static TrayIcon mTrayIcon;
     static String mKey = "1234";
+    private static ConfigFileProcessorClass config;
 }

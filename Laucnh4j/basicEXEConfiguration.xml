@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_jar\EncryptedMessagingProject.jar</jar>
+  <outfile>E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_exe\EncryptedMessagingProject.exe</outfile>
+  <errTitle>Please install java fisrt (20).</errTitle>
+  <cmdLine></cmdLine>
+  <chdir>.</chdir>
+  <priority>normal</priority>
+  <downloadUrl>https://www.java.com/fr/</downloadUrl>
+  <supportUrl></supportUrl>
+  <stayAlive>false</stayAlive>
+  <restartOnCrash>true</restartOnCrash>
+  <manifest></manifest>
+  <icon>E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_jar\mainIcon.ico</icon>
+  <singleInstance>
+    <mutexName>EncryptedMessagingProject</mutexName>
+    <windowTitle>EncryptedMessagingProject</windowTitle>
+  </singleInstance>
+  <classPath>
+    <mainClass>Main</mainClass>
+    <cp>zip4j-2.11.5.jar</cp>
+    <cp>flatlaf-3.0.jar</cp>
+  </classPath>
+  <jre>
+    <path>jre</path>
+    <requiresJdk>false</requiresJdk>
+    <requires64Bit>false</requires64Bit>
+    <minVersion></minVersion>
+    <maxVersion></maxVersion>
+  </jre>
+</launch4jConfig>

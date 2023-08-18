@@ -1,0 +1,22 @@
+
+
+Version:	3.50
+CmdLine:	E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_exe\EncryptedMessagingProject.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Create mutex:	EncryptedMessagingProject
+Working dir:	E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_exe\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	jre
+Check launcher:	E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_exe\jre\bin\javaw.exe (OK)
+Version string: 1.020.000_002 / 64-Bit (OK)
+Main class:	Main
+Add classpath:	zip4j-2.11.5.jar
+Add classpath:	flatlaf-3.0.jar
+Launcher:	E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_exe\jre\bin\javaw.exe
+Launcher args:	-classpath "E:\Programmation\Java\Projects\EncryptedMessagingProject\out\artifacts\EncryptedMessagingProject_exe\EncryptedMessagingProject.exe;zip4j-2.11.5.jar;flatlaf-3.0.jar" Main
+Args length:	181/32768 chars
+Exit code:	0
